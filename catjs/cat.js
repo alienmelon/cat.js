@@ -1,8 +1,8 @@
 /*
 
-              ,---------------------------.             
-     ^,^      |     welcome to CAT.JS!    | `  _ ,  '   
-    (o o)     `--------------------------(_-  (o)o)  -  
+              ,---------------------------.
+     ^,^      |     welcome to CAT.JS!    | `  _ ,  '
+    (o o)     `--------------------------(_-  (o)o)  -
 ooO--(_)--Ooo---------------------------- -ooO'(_)--Ooo-
 
 a virtual pet cat for your website
@@ -27,12 +27,13 @@ var str_soundPath = "catjs/catjs_audio";
 var str_imagePath = "catjs/catjs_images";
 
 //cat height & width (if you change the cat graphic you have to update these)
-var num_catHeight = 270;
-var num_catWidth = 235;
+var num_catWidth = 270;
+var num_catHeight = 235;
 
 //vars
 var snd_cat; //sound object
 var div_cat; //cat div
+var button_pet_cat; // keyboard pet cat button
 var bool_pet = false; //is cat being pet?
 var int_cat; //interval for cat (control animation)
 var num_animationChange = 100; //count down to change cat animation
@@ -51,12 +52,12 @@ function math_randRange(num_min, num_max){
 
 //everytime you pet the cat console cat gets pet too!
 function consoleCat(){
-	
+
 	var u = arr_consoleCat[Math.ceil(Math.random()*arr_consoleCat.length)-1];
 	var e = arr_consoleCatEyes[Math.ceil(Math.random()*arr_consoleCatEyes.length)-1];
-	
+
 	if(Math.random()*100 > 50){
-		
+
 		console.log("       /\u005C ___ /\u005C");
 		console.log("      (  " + e + "   " + e + "  )");
 		console.log("       \u005C  >" + u + "<  / ");
@@ -65,10 +66,10 @@ function consoleCat(){
 		console.log("     |           |     //");
 		console.log("      \u005C         /    //");
 		console.log("       ///  /// ");
-		
-		
+
+
 	}else{
-		
+
 		console.log("      ");
 		console.log("        /\u005C___/\u005C");
 		console.log("       ( " + e + "   " + e + " )");
@@ -77,7 +78,7 @@ function consoleCat(){
 		console.log("       (         )");
 		console.log("       (          )))))))))))");
 		console.log("        ///  /// ");
-		
+
 	}
 }
 
@@ -129,7 +130,7 @@ function hideAllCatAnimations(){
 function animateCat(){
 	//if default, cycle through divs
 	//if clicked hold off until counter reaches 0 and then go back to default
-	
+
 	//not clicked (idle)
 	if(!bool_pet){
 		num_animationChange -= 1;
@@ -140,7 +141,7 @@ function animateCat(){
 			changeCatIdleAnimation();
 		}
 	}
-	
+
 	//clicked (pet toggled)
 	if(bool_pet){
 		num_animationChange -= 1;
@@ -149,7 +150,7 @@ function animateCat(){
 			resetCatPetState();
 		};
 	}
-	
+
 }
 
 function petCat(){
@@ -166,6 +167,14 @@ function petCat(){
 	consoleCat();
 }
 
+function showPetButton(){
+	button_pet_cat.style.clip = 'auto';
+}
+
+function hidePetButton(){
+	button_pet_cat.style.clip = 'rect(1px,1px,1px,1px)';
+}
+
 //show hand as cursor and theme it a little...
 function event_cat_mouseOver(){
 	div_cat.style.cursor = 'grab';
@@ -180,7 +189,7 @@ function makeCatAnimations(str_id, str_image, appendTo){
 	catAnim.id = str_id;
 	catAnim.className = "catjs";
 	appendTo.appendChild(catAnim);
-	catAnim.innerHTML = '<img src='+str_imagePath + "/" + str_image + '>';
+	catAnim.innerHTML = '<img src="'+str_imagePath + "/" + str_image + '" alt="Cat">';
 	catAnim.style.position = 'absolute';
 	//catAnim.style.width = num_catWidth+"px";
 	//catAnim.style.height = num_catHeight+"px";
@@ -198,7 +207,14 @@ function setupCat(){
 	//div_cat.style.height = num_catHeight+"px";
 	div_cat.style.left = '0px';
 	div_cat.style.bottom = num_catHeight + 'px';
-	
+
+	button_pet_cat = document.createElement("button");
+	button_pet_cat.textContent = "Pet cat";
+	button_pet_cat.style.position = 'fixed';
+	button_pet_cat.style.left = '0px';
+	button_pet_cat.style.bottom = '0px';
+	hidePetButton();
+
 	//add images
 	//the idle animations
 	for(var i = 0; i<arr_catImages_idle.length; ++i){
@@ -208,10 +224,11 @@ function setupCat(){
 	for(var i = 0; i<arr_catImages_pet.length; ++i){
 		makeCatAnimations("cat_pet0" + String(i + 1), arr_catImages_pet[i], div_cat);
 	}
-	
+
 	//add cat last...
 	document.getElementsByTagName("body")[0].appendChild(div_cat);
-	
+	div_cat.appendChild(button_pet_cat);
+
 	//hide all
 	hideAllCatAnimations();
 	//show first
@@ -234,20 +251,25 @@ function shoo(){
 }
 
 function cat(){
-	
+
 	console.log("       /\u005C_/\u005C ");
 	console.log("      ( o.o )");
 	console.log("       > ^ <          a cat approaches!");
-	
+
 	setupCat();
 	num_animationChange = math_randRange(10, 50);
-	
+
 	int_cat = setInterval(animateCat, 100);
-	
+
 	div_cat.addEventListener("click", petCat);
 	div_cat.addEventListener("mouseover", event_cat_mouseOver);
 	div_cat.addEventListener("mouseup", event_cat_mouseOver);
 	div_cat.addEventListener("mousedown", event_cat_mouseDown);
-	
+
+	// pet button implicitly pets cat when pressed,
+	// due to bubbling click event of `div_cat`
+	button_pet_cat.addEventListener("focus", showPetButton);
+	button_pet_cat.addEventListener("blur", hidePetButton);
+
 	//shoo();
 }
